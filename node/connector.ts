@@ -210,6 +210,8 @@ export default class PaymentsWayProvider extends PaymentProvider<Clients> {
     // No hardcodear heimdall.vtexpayments.com.br (solo Brasil)
     const responseUrl = authorization.callbackUrl || 'https://gateway.vtexpayments.com.br/api/payment-provider/callback'
 
+    const orderDescription = `Compra VTEX - Orden ${orderNumber}`
+
     const payload = {
       form_id: Number(formId),
       terminal_id: Number(terminalId),
@@ -219,6 +221,7 @@ export default class PaymentsWayProvider extends PaymentProvider<Clients> {
       currency,
       checksum,
       response_url: responseUrl,
+      order_description: orderDescription,
     }
 
     console.log('[PaymentsWay][authorize] payload (response_url truncated)', {
@@ -227,7 +230,10 @@ export default class PaymentsWayProvider extends PaymentProvider<Clients> {
     })
 
     try {
-      const response: any = await this.context.clients.paymentsWay.createTransaction(payload)
+      const response: any = await this.context.clients.paymentsWay.createTransaction(
+        payload,
+        String(apiKey)
+      )
 
       console.log('[PaymentsWay][authorize] paymentsWay response', safeStringify(response))
 

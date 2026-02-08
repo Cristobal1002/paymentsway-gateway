@@ -8,7 +8,12 @@ export class PaymentsWayClient extends ExternalClient {
     })
   }
 
-  public createTransaction(data: any) {
-    return this.http.post('/link-de-pago/create', data)
+  public createTransaction(data: Record<string, unknown>, apiKey: string) {
+    return this.http.post('/link-de-pago/create', data, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: apiKey,
+      },
+    })
   }
 }

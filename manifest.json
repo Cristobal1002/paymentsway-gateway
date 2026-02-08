@@ -1,7 +1,7 @@
 {
   "name": "paymentsway-gateway",
   "vendor": "paymentswaypartnerco",
-  "version": "0.1.10-beta.0",
+  "version": "0.1.11-beta.0",
   "title": "PaymentsWay Payment Gateway",
   "description": "PaymentsWay Payment Gateway integration for VTEX",
   "builders": {

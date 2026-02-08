@@ -1,13 +1,12 @@
 {
-  "name": "payment-provider-example",
-  "vendor": "vtex",
-  "version": "1.2.0",
-  "title": "Payment Provider Example",
-  "description": "Reference app for Payment-Provider protocol implementers",
+  "name": "paymentsway-gateway",
+  "vendor": "paymentswaypartnerco",
+  "version": "0.1.8-beta",
+  "title": "PaymentsWay Payment Gateway",
+  "description": "PaymentsWay Payment Gateway integration for VTEX",
   "builders": {
     "paymentProvider": "1.x",
-    "node": "6.x",
-    "docs": "0.x"
+    "node": "6.x"
   },
   "policies": [
     {
@@ -22,8 +21,29 @@
     {
       "name": "outbound-access",
       "attrs": {
+        "host": "merchantpruebas.vepay.com.co",
+        "path": "/*"
+      }
+    },
+    {
+      "name": "outbound-access",
+      "attrs": {
         "host": "heimdall.vtexpayments.com.br",
         "path": "/api/payment-provider/callback/*"
+      }
+    },
+    {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "gateway.vtexpayments.com.br",
+        "path": "/*"
+      }
+    },
+    {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "gatewayqa.vtexpayments.com.br",
+        "path": "/*"
       }
     }
   ],

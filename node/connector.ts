@@ -177,9 +177,54 @@ export default class PaymentsWayProvider extends PaymentProvider<Clients> {
       }
     }
 
+    // ====== 3) Fallback: Variables de entorno (workaround cuando VTEX no envía settings) ======
+    if (!hasAllSettings(settings)) {
+      const envSettings = normalizeSettings({
+        merchantId: process.env.PAYMENTSWAY_MERCHANT_ID,
+        terminalId: process.env.PAYMENTSWAY_TERMINAL_ID,
+        formId: process.env.PAYMENTSWAY_FORM_ID,
+        apiKey: process.env.PAYMENTSWAY_API_KEY,
+      })
+      if (hasAllSettings(envSettings)) {
+        console.warn('[PaymentsWay][authorize] using env vars fallback for settings')
+        settings = {
+          merchantId: settings.merchantId ?? envSettings.merchantId,
+          terminalId: settings.terminalId ?? envSettings.terminalId,
+          formId: settings.formId ?? envSettings.formId,
+          apiKey: settings.apiKey ?? envSettings.apiKey,
+        }
+      }
+    }
+
+    // ====== 4) Fallback: VBase (para pruebas cuando VTEX no envía settings) ======
+    const VBASE_BUCKET = 'paymentsway'
+    const VBASE_PATH = 'provider-settings.json'
+    if (!hasAllSettings(settings)) {
+      try {
+        const vbaseData = await this.context.clients.vbase.getJSON<Record<string, string>>(
+          VBASE_BUCKET,
+          VBASE_PATH,
+          true
+        )
+        const vbaseSettings = normalizeSettings(vbaseData)
+        if (hasAllSettings(vbaseSettings)) {
+          console.warn('[PaymentsWay][authorize] using VBase fallback for settings')
+          settings = {
+            merchantId: settings.merchantId ?? vbaseSettings.merchantId,
+            terminalId: settings.terminalId ?? vbaseSettings.terminalId,
+            formId: settings.formId ?? vbaseSettings.formId,
+            apiKey: settings.apiKey ?? vbaseSettings.apiKey,
+          }
+        }
+      } catch (err) {
+        const e = err as Error
+        console.warn('[PaymentsWay][authorize] VBase fallback failed:', e?.message)
+      }
+    }
+
     const { merchantId, terminalId, formId, apiKey } = settings
 
-    // ====== 3) Validación final ======
+    // ====== 5) Validación final ======
     if (!merchantId || !terminalId || !formId || !apiKey) {
       console.error('[PaymentsWay][authorize] Missing settings fields FINAL', {
         merchantId,
@@ -197,7 +242,7 @@ export default class PaymentsWayProvider extends PaymentProvider<Clients> {
       )
     }
 
-    // ====== 4) Construcción payload hacia PaymentsWay ======
+    // ====== 6) Construcción payload hacia PaymentsWay ======
     const amount = authorization.value
     const currency = authorization.currency
     const orderNumber = authorization.paymentId

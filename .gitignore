@@ -196,6 +196,7 @@ ClientBin/
 *.pfx
 *.publishsettings
 node_modules/
+.env
 package-lock.json
 orleans.codegen.cs
 
